@@ -13,12 +13,6 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-#define UTIME_INDEX 14u
-#define STIME_INDEX 15u
-#define CUTIME_INDEX 16u
-#define CSTIME_INDEX 17u
-#define STARTTIME_INDEX 22u
-
 Process::Process(int process_num) {
   Pid_ = process_num;
   Command_ = LinuxParser::Command(Pid_);
@@ -32,51 +26,7 @@ int Process::Pid() { return Pid_; }
 
 // Return this process's CPU utilization
 float Process::CpuUtilization() const {
-  string line, key, value;
-  unsigned int index = 0;
-  long utime, stime, cutime, cstime, starttime;
-  long total_time, seconds, uptime;
-  float cpu_usage;
-  uptime = LinuxParser::UpTime();
-  std::ifstream stream(LinuxParser::kProcDirectory + to_string(Pid_) +
-                       LinuxParser::kStatFilename);
-  if (stream.is_open()) {
-    while (std::getline(stream, line)) {
-      std::istringstream linestream(line);
-      while (linestream >> value) {
-        switch (index) {
-          case UTIME_INDEX:
-            utime = atol(value.c_str());
-            index++;
-            break;
-          case STIME_INDEX:
-            stime = atol(value.c_str());
-            index++;
-            break;
-          case CUTIME_INDEX:
-            cutime = atol(value.c_str());
-            index++;
-            break;
-          case CSTIME_INDEX:
-            cstime = atol(value.c_str());
-            index++;
-            break;
-          case STARTTIME_INDEX:
-            starttime = atol(value.c_str());
-            index++;
-            break;
-
-          default:
-            index++;
-            break;
-        }
-      }
-    }
-  }
-  total_time = utime + stime + cutime + cstime;
-  seconds = uptime - (starttime / sysconf(_SC_CLK_TCK));
-  cpu_usage = 100 * ((total_time / sysconf(_SC_CLK_TCK)) / seconds);
-  return cpu_usage;
+  return LinuxParser::CpuUtilization(Pid_);
 }
 
 // Return the command that generated this process

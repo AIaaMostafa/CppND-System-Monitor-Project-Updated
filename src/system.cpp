@@ -23,10 +23,11 @@ Processor& System::Cpu() { return cpu_; }
 vector<Process>& System::Processes() {
   vector<int> AllProcesses;
   AllProcesses = LinuxParser::Pids();
-  for (unsigned int count = 0; count < AllProcesses.size(); count++) {
-    Process process(AllProcesses[count]);
+  for (auto count : AllProcesses) {
+    Process process(count);
     processes_.push_back(process);
   }
+  std::sort(processes_.begin(), processes_.end());
   return processes_;
 }
 
