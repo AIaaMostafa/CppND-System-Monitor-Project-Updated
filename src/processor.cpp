@@ -1,4 +1,9 @@
 #include "processor.h"
 
-// TODO: Return the aggregate CPU utilization
-float Processor::Utilization() { return 0.0; }
+#include "linux_parser.h"
+
+// Return the aggregate CPU utilization
+float Processor::Utilization() {
+  // CPU_Percentage = (totald - idled)/totald
+  return (LinuxParser::ActiveJiffies() / LinuxParser::Jiffies());
+}
